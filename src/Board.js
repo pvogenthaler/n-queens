@@ -189,28 +189,7 @@
           }
         }
       }
-
       return output;
-
-
-      // var storage = [];
-      // var matrix = this.attributes;
-      // _.each(matrix, function (row, i) {
-      //   _.each(row, function (item, j) {
-          
-      //     if (item === 1) {
-      //       storage.push([parseInt(i), j]);
-      //     }
-      //   });
-      // });
-      // console.log(storage);
-
-      // _.each(storage, function (positon) {
-      //   if (_.contains(storage, [positon[0] + 1, positon[1] + 1])) {
-      //     return true;
-      //   }
-      // });
-      // return false;
     },
 
 
@@ -220,21 +199,31 @@
     //
     // test if a specific minor diagonal on this board contains a conflict
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      // var storage = [];
-      // _.each(this, function (row, i) {
-      //   var item = row [minorDiagonalColumnIndexAtFirstRow];      
-      //   if (item === 1) {
-      //     storage.push([i, j]);
-      //   }
-        
-      // });
+      var i = minorDiagonalColumnIndexAtFirstRow;
+      var matrix = this.attributes;
+      var counter = 0;
+      
+      _.each(matrix, function (row) {
+        if (row[i] === 1) {
+          counter++;
+        }
+        i--;
+      }, this);
+      return counter > 1;    
+    },
 
-      // _.each(storage, function (positon) {
-      //   if (_.contains(storage, [positon[0] + 1, positon[1] + 1])) {
-      //     return true;
-      //   }
-      // });
-      // return false;
+    hasMinorDiagonalConflictAtReverse: function(minorDiagonalColumnIndexAtLastRow) {
+      var i = minorDiagonalColumnIndexAtLastRow;
+      var matrix = this.attributes;
+      var counter = 0;
+      var length = this.get('n');
+      for (var j = length - 1; j >= 0; j--) {
+        if (matrix[j][i] === 1) {
+          counter++;
+        }
+        i++;
+      }
+      return counter > 1;
     },
 
     // test if any minor diagonals on this board contain conflicts
@@ -245,22 +234,25 @@
       //  check if [position[0] + 1, position[1] - 1] is in storage
       // if so, return true
       //outside each, return false
-      var storage = [];
       var matrix = this.attributes;
-      _.each(matrix, function (row, i) {
-        _.each(row, function (item, j) {
-          if (item === 1) {
-            storage.push([i, j]);
+      var length = this.get('n') - 1;
+      var output = false;
+      _.each(matrix, function (row) {
+        for (var index = length; index >= 0; index--) {
+          if (output === false) {
+            output = this.hasMinorDiagonalConflictAt(index);
           }
-        });
-      });
-
-      _.each(storage, function (positon) {
-        if (_.contains(storage, [positon[0] + 1, positon[1] - 1])) {
-          return true;
         }
-      });
-      return false;
+      }, this);
+
+      for (var i = length; i >= 0; i--) {
+        _.each(matrix[i], function (item, j) {
+          if (output === false) {
+            output = this.hasMinorDiagonalConflictAtReverse(j);
+          }
+        }, this);
+      }
+      return output;
     },
 
     /*--------------------  End of Helper Functions  ---------------------*/
