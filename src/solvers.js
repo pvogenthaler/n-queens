@@ -11,9 +11,8 @@
 // take a look at solversSpec.js to see what the tests are expecting
 
 
+
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
-
-
 
 window.findNRooksSolution = function(n) {
   var solution = [];
@@ -28,28 +27,44 @@ window.findNRooksSolution = function(n) {
     temp[i] = 1;
     solution.push(temp);
   }
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
 };
 
-window.findNRooksSolution(3);
+
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
-window.countNRooksSolutions = function(n) {
-  // var solutionCount = undefined; //fixme
 
-  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  // return solutionCount;
-  if (n === 1) {
-    return 1;
-  } else {
-    return n * window.countNRooksSolutions(n - 1);
+window.countNRooksSolutions = function(n) {
+  var solutionCount = 0;
+  var matrix = new Board(findNRooksSolution(n));
+  var board = matrix.rows();
+
+  var recurse = function(combosLeft, result) {
+    if (n === 0) {                                    // exception
+      return solutionCount++;
+    } else if (combosLeft === 0) {                    // base
+      var temp = new Board(result);
+      if (!temp.hasAnyRooksConflicts()) {
+        solutionCount++;
+      }
+      return;
+    } else {                                          // recursive
+      for (var i = 0; i < board.length; i++) {
+        recurse(combosLeft - 1, result.concat([board[i]]));
+      };
+    }
   }
 
-  // return 
+  recurse(n, []);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  return solutionCount;
 };
 
+
+
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
+
 window.findNQueensSolution = function(n) {
   var solution = [];
   var row = [];
@@ -59,19 +74,11 @@ window.findNQueensSolution = function(n) {
   } else if (n === 2 || n === 3) {
     var board = new Board({n : n});
     solution = board.attributes;
-  } 
-  else if (n > 3) {
-
+  } else if (n > 3) {
     for (var j = 0; j < n; j++) {
       row.push(0);
     }
-    // for (var j = 0; j < n; j++) {
-    //   solution.push(row);
-    // }
-
-
     var i = -1;
-
     for (var j = 0; j < n; j++) {
       var dup = row.slice();
       i += 2;
@@ -82,26 +89,38 @@ window.findNQueensSolution = function(n) {
       solution.push(dup);
     }
   }
-  // _.each(solution, function (r) {
-    
-  //   i += 2;
-  //   if (i > n) {
-  //     i = 0;
-  //   }
-  //   r[i] = 1;
-  //   console.log("row for nqueens", r);
-  // });
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
-window.findNQueensSolution(4);
+
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
-window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+window.countNQueensSolutions = function(n) {
+  // create results counter, combinations array, matrix obj, and board []
+  var solutionCount = 0;
+  var matrix = new Board(findNRooksSolution(n));
+  var board = matrix.rows();
+
+  var recurse = function(combosLeft, result) {
+    if (n === 0) {                                    // exception
+      return solutionCount++;
+    } else if (combosLeft === 0) {                    // base
+      var temp = new Board(result);
+      if (!temp.hasAnyQueensConflicts()) {
+        solutionCount++;
+      }
+      return;
+    } else {                                          // recursive
+      for (var i = 0; i < board.length; i++) {
+        recurse(combosLeft - 1, result.concat([board[i]]));
+      };
+    }
+  }
+
+  recurse(n, []);
+  // console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
-};
+}
